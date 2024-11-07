@@ -35,14 +35,19 @@ public class PrimaryController {
     private volatile boolean listening = true; //used to kill the thread in the login page if the login is successful
 
     @FXML
+    public void initialize() {
+        ConnectionManager.getInstance().connect("localhost", 5000);
+        in = ConnectionManager.getInstance().getInputStream();
+        out = ConnectionManager.getInstance().getOutputStream();
+    }
+
+    @FXML
     private void OpenDashboard(ActionEvent event) {
 
         //1) check for empty string
         if (!usernameInput.getText().equalsIgnoreCase("")) { //if the login field is empty, then throw an alert
             //2) create the connection
-            ConnectionManager.getInstance().connect("localhost", 5000);
-            in = ConnectionManager.getInstance().getInputStream();
-            out = ConnectionManager.getInstance().getOutputStream();
+
             userName = usernameInput.getText();//get the username
             password = passwordInput.getText();//get the password
             out.println(userName);//send the username to the server
@@ -61,13 +66,13 @@ public class PrimaryController {
                             case "8"://good login?
                                 listening = false;
                                 Platform.runLater(() -> {
-                            try {
-                                App.setRoot("secondary");
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                            
-                        });
+                                    try {
+                                        App.setRoot("Dashboard");
+                                    } catch (IOException ex) {
+                                        ex.printStackTrace();
+                                    }
+
+                                });
                                 break;
                             case "1"://login with admin rights?
 
@@ -75,7 +80,7 @@ public class PrimaryController {
                                 Platform.runLater(() -> {
                                     createAlert("Error Logging In", "Error, Incorrect Username, Password, or account is disabled\nPlease contact your administrator");
                                 });
-                                
+
                             case "20"://case 20 will be used for password change
 
                         }
@@ -96,8 +101,6 @@ public class PrimaryController {
         }
 
     }
-
-    
 
     private void createAlert(String header, String content) {
 
